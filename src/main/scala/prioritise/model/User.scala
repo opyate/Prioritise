@@ -3,9 +3,9 @@ package prioritise.model
 import _root_.net.liftweb.mapper._
 import _root_.net.liftweb.util._
 import _root_.net.liftweb.common._
-import xml.Text
 import net.liftweb.sitemap.Loc.{LocParam, If, Template}
 import net.liftweb.http.{SessionVar, S}
+import xml.{NodeSeq, Text}
 
 /**
  * The singleton that has methods for accessing the database
@@ -39,4 +39,18 @@ class User extends MegaProtoUser[User] with OneToMany[Long, User] {
     OrderBy(Task.id, Descending))
           with Owned[Task]
           with Cascade[Task]
+
+  // helpers
+  // myTasks returns the root (top-level) tasks
+  def myTasks: List[Task] = Task.findAll(By(Task.user, this.id),
+    ByRef(Task.parent_task, Task.id))
+
+//  private def _myTasksAsHtml: Box[NodeSeq] = {
+//    val xhtml: NodeSeq = myTasks.flatMap(t => t.toHtml)
+//    xhtml.isEmpty match {
+//      case true => Empty
+//      case false => Full(xhtml)
+//    }
+//  }
+//  def myTasksAsHtml: NodeSeq = _myTasksAsHtml openOr <span>You have no tasks. <a href="/task_t/create">Create</a> one.</span>
 }

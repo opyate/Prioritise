@@ -7,6 +7,9 @@ class LiftProject(info: ProjectInfo) extends DefaultWebProject(info) {
 
   val liftVersion = "2.2"
 
+  // for jrebel
+  override def scanDirectories = Nil
+
   override def libraryDependencies = Set(
     "net.liftweb" %% "lift-webkit" % liftVersion % "compile->default",
     "net.liftweb" %% "lift-testkit" % liftVersion % "compile->default",

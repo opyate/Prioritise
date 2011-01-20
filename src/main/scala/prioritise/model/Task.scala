@@ -1,16 +1,16 @@
-
-
-
-
 package prioritise.model
 
 import net.liftweb._
 import mapper._
-import util._
 import common._
 import sitemap.Loc._
+import xml.NodeSeq
 
-class Task extends LongKeyedMapper[Task] with CreatedUpdated with IdPK {
+/**
+ * See http://stackoverflow.com/questions/192220/what-is-the-most-efficient-elegant-way-to-parse-a-flat-table-into-a-tree/192462#192462
+ * for ancestor/descendant discussion.
+ */
+class Task extends LongKeyedMapper[Task] with CreatedUpdated with IdPK with OneToMany[Long, Task] {
 
   def getSingleton = Task
 
@@ -18,9 +18,9 @@ class Task extends LongKeyedMapper[Task] with CreatedUpdated with IdPK {
 
   object description extends MappedTextarea(this, 8192)
 
-  object dueDateTime extends MappedDateTime(this)
-
-  object startDateTime extends MappedDateTime(this)
+//  object dueDateTime extends MappedDateTime(this)
+//
+//  object startDateTime extends MappedDateTime(this)
 
   object user extends LongMappedMapper(this, User) {
     override def dbColumnName = "user_id"
@@ -31,8 +31,27 @@ class Task extends LongKeyedMapper[Task] with CreatedUpdated with IdPK {
       })
   }
 
-  object rank extends MappedInt(this)
+  object priority_ancestor extends LongMappedMapper(this, Task) {
+    override def dbColumnName = "priority_ancestor_id"
+    override def dbDisplay_? = false
+  }
+
+  object priority_descendant extends LongMappedMapper(this, Task) {
+    override def dbColumnName = "priority_descendant_id"
+    override def dbDisplay_? = false
+  }
+
+  object parent_task extends LongMappedMapper(this, Task) {
+    override def dbColumnName = "parent_task_id"
+    //override def dbDisplay_? = false
+  }
+
+  object dependencies extends MappedOneToMany(Task, Task.parent_task,
+    OrderBy(Task.id, Descending))
+          with Owned[Task]
+          with Cascade[Task]
 }
+
 object Task extends Task with LongKeyedMetaMapper[Task] with CRUDify[Long, Task] {
 
   override def calcPrefix = List(_dbTableNameLC)
@@ -48,4 +67,10 @@ object Task extends Task with LongKeyedMetaMapper[Task] with CRUDify[Long, Task]
   override def editMenuLocParams = LocGroup("public") :: Nil
 
   override def deleteMenuLocParams = LocGroup("public") :: Nil
+
+  override def afterSave = List((task: Task) => {
+      if (!task.parent_task.defined_?) {
+        task.parent_task(task.id).save
+      }
+    })
 }
