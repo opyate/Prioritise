@@ -32,7 +32,7 @@ class TaskManager {
   }
 
   def add_button(xhtml: NodeSeq): NodeSeq = {
-    bind("c", bind("d", xhtml, "add_task" -> <a href="#">Add a new task</a>))
+    bind("c", bind("d", xhtml, "add_task" -> <a href="/task_t/create">Add a new task</a>))
   }
 
   private def task(t: Task, xhtml: NodeSeq): NodeSeq = {

@@ -2,4 +2,4 @@ Codename "Prioritise", for lack of a better name.
 
 h1. Introduction
 
-Hopefully a way to consolidate lists I keep on "Tadalist":http://tadalist.com/, "Remember The Milk":http://www.rememberthemilk.com/, "Things":http://culturedcode.com/things/, "JIRA":http://www.atlassian.com/software/jira/, "Stickies":http://en.wikipedia.org/wiki/Stickies_(software), "Evernote":http://www.evernote.com/, "Google Docs": https://docs.google.com, and various text files called TODO.txt scattered all over the place. 
+Hopefully a way to consolidate lists I keep on "Tadalist":http://tadalist.com/, "Remember The Milk":http://www.rememberthemilk.com/, "Things":http://culturedcode.com/things/, "JIRA":http://www.atlassian.com/software/jira/, "Stickies":http://en.wikipedia.org/wiki/Stickies_(software), "Evernote":http://www.evernote.com/, "Google Docs":https://docs.google.com, and various text files called TODO.txt scattered all over the place. 

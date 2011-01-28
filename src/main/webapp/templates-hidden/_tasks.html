@@ -1,6 +1,10 @@
 <div>
-    <h2>Your tasks</h2>
     <lift:test_cond.loggedin>
+        <lift:TaskManager.add_button>
+            <d:add_task/>
+        </lift:TaskManager.add_button>
+
+        <hr class="space"/>
         <lift:TaskManager.chooser>
             <tasks:full>
                 <lift:TaskManager.items>
@@ -15,14 +19,12 @@
                     </div>
                 </lift:TaskManager.items>
             </tasks:full>
+
             <tasks:empty>
-                <p>You don't have any tasks.</p>
+                
             </tasks:empty>
         </lift:TaskManager.chooser>
         
-        <lift:TaskManager.add_button>
-            <d:add_task/>
-        </lift:TaskManager.add_button>
     </lift:test_cond.loggedin>
 
     <lift:test_cond.loggedout>

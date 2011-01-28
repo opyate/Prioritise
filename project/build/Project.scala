@@ -19,6 +19,7 @@ class LiftProject(info: ProjectInfo) extends DefaultWebProject(info) {
     "junit" % "junit" % "4.5" % "test->default",
     "org.scala-tools.testing" %% "specs" % "1.6.6" % "test->default",
     "net.liftweb" %% "lift-mapper" % liftVersion % "compile->default",
-    "com.h2database" % "h2" % "1.2.138"
+    "com.h2database" % "h2" % "1.2.138",
+    "mysql" % "mysql-connector-java" % "5.1.13" % "compile->default"
   ) ++ super.libraryDependencies
 }

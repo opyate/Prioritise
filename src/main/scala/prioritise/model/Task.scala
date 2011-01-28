@@ -14,6 +14,13 @@ class Task extends LongKeyedMapper[Task] with CreatedUpdated with IdPK with OneT
 
   def getSingleton = Task
 
+  override lazy val createdAt: MappedDateTime[MapperType] = new MyCreatedAt(this) {
+    override def dbDisplay_? = false
+  }
+  override lazy val updatedAt: MyUpdatedAt = new MyUpdatedAt(this) {
+    override def dbDisplay_? = false
+  }
+
   object title extends MappedString(this, 32)
 
   object description extends MappedTextarea(this, 8192)
@@ -25,10 +32,16 @@ class Task extends LongKeyedMapper[Task] with CreatedUpdated with IdPK with OneT
   object user extends LongMappedMapper(this, User) {
     override def dbColumnName = "user_id"
 
+    override def defaultValue = User.currentUser.map(_.id.is) openOr 0L
+
     override def validSelectValues =
       Full(User.findMap(OrderBy(User.email, Ascending)) {
         case s: User => Full(s.id.is -> s.email.is)
       })
+
+    // TODO for now, the app is single user, but later on allow
+    // higher ROLEd persons to create tasks for the inferior masses.
+    override def dbDisplay_? = false
   }
 
   object priority_ancestor extends LongMappedMapper(this, Task) {
@@ -41,9 +54,15 @@ class Task extends LongKeyedMapper[Task] with CreatedUpdated with IdPK with OneT
     override def dbDisplay_? = false
   }
 
+  // TODO guard against circular dependencies
+  // t1 -> t2 -> t3 -> t1
   object parent_task extends LongMappedMapper(this, Task) {
     override def dbColumnName = "parent_task_id"
-    //override def dbDisplay_? = false
+
+    override def validSelectValues =
+      Full(Task.findMap(OrderBy(Task.updatedAt, Descending)) {
+        case s: Task => Full(s.id.is -> s.title.is)
+      })
   }
 
   object dependencies extends MappedOneToMany(Task, Task.parent_task,
@@ -53,6 +72,8 @@ class Task extends LongKeyedMapper[Task] with CreatedUpdated with IdPK with OneT
 }
 
 object Task extends Task with LongKeyedMetaMapper[Task] with CRUDify[Long, Task] {
+
+  override lazy val fieldOrder = List(title, description, parent_task)
 
   override def calcPrefix = List(_dbTableNameLC)
 
