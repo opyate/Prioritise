@@ -40,17 +40,15 @@ class User extends MegaProtoUser[User] with OneToMany[Long, User] {
           with Owned[Task]
           with Cascade[Task]
 
-  // helpers
-  // myTasks returns the root (top-level) tasks
-  def myTasks: List[Task] = Task.findAll(By(Task.user, this.id),
-    ByRef(Task.parent_task, Task.id))
+  /**
+   * All tasks, newest first
+   */
+  def myTasks: List[Task] = Task.findAll(By(Task.user, this.id), OrderBy(Task.createdAt, Descending))
 
-//  private def _myTasksAsHtml: Box[NodeSeq] = {
-//    val xhtml: NodeSeq = myTasks.flatMap(t => t.toHtml)
-//    xhtml.isEmpty match {
-//      case true => Empty
-//      case false => Full(xhtml)
-//    }
-//  }
-//  def myTasksAsHtml: NodeSeq = _myTasksAsHtml openOr <span>You have no tasks. <a href="/task_t/create">Create</a> one.</span>
+  /**
+   * All top-level (root) tasks, newest first
+   */
+  def myRootTasks: List[Task] = Task.findAll(By(Task.user, this.id),
+    ByRef(Task.parent_task, Task.id), OrderBy(Task.createdAt, Descending))
+
 }

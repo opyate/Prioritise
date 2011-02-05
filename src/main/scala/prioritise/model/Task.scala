@@ -54,13 +54,12 @@ class Task extends LongKeyedMapper[Task] with CreatedUpdated with IdPK with OneT
     override def dbDisplay_? = false
   }
 
-  // TODO guard against circular dependencies
-  // t1 -> t2 -> t3 -> t1
+  // TODO guard against circular dependencies, e.g. t1 -> t2 -> t3 -> t1
   object parent_task extends LongMappedMapper(this, Task) {
     override def dbColumnName = "parent_task_id"
 
     override def validSelectValues =
-      Full(Task.findMap(OrderBy(Task.updatedAt, Descending)) {
+      Full((this.fieldOwner.id.is, "None") :: Task.findMap(OrderBy(Task.updatedAt, Descending)) {
         case s: Task => Full(s.id.is -> s.title.is)
       })
   }
@@ -69,6 +68,10 @@ class Task extends LongKeyedMapper[Task] with CreatedUpdated with IdPK with OneT
     OrderBy(Task.id, Descending))
           with Owned[Task]
           with Cascade[Task]
+
+  lazy val hasParent = {
+    this.parent_task.is != this.id.is
+  }
 }
 
 object Task extends Task with LongKeyedMetaMapper[Task] with CRUDify[Long, Task] {
